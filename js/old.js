@@ -1,7 +1,5 @@
-//
-// Simple example of a newtonian orbit
-//
-
+//Magnet Star created by Peyton Bair
+//using physics.js and a little help from my sister Karlie
 //local storage
 localStorage.setItem('easy',0);
 localStorage.setItem('med',0);
@@ -9,14 +7,12 @@ localStorage.setItem('hard',0);
 var easy_progress = localStorage.getItem('easy');
 var med_progress = localStorage.getItem('med');
 var hard_progress = localStorage.getItem('hard');
-
+//canvas creation and document setup
 var canvas = document.getElementById("viewport");
-
 var ctx = canvas.getContext("2d");
 var overlay = document.getElementById("overlay");
 var start_screen = document.getElementById("start_screen");
 var menu_screen = document.getElementById("menu");
-
 
 //global variables
 var mode = 1;
@@ -28,7 +24,6 @@ var pause_count = 5;
 var place_state = 1; //1 = attractor, 2 = repel etc..
 var hardness = 1;
 var easy_img = new Image();
-
 var medium_img= new Image();
 var hard_img = new Image();
 var logo_img = new Image();
@@ -36,6 +31,17 @@ var home_img = new Image();
 var restart_img = new Image();
 var pause_img = new Image();
 var play_img = new Image();
+
+//Audio
+var music = document.getElementById("music");
+music.loop = true;
+var click = document.getElementById('click');
+var plop1 = document.getElementById('plop1');
+var plop2 = document.getElementById('plop2');
+var ding = document.getElementById('ding');
+var complete = document.getElementById('complete');
+var woosh = document.getElementById('woosh');
+
 
 window.onload = function() {
     var sources = {
@@ -56,9 +62,9 @@ window.onload = function() {
         resource15: "img/spike.png"
 
     };
-    loadImages(sources, initGame);  // calls initGame after *all* images have finished loading
+    loadImages(sources, initGame);  // calls initGame after all images have finished loading
 };
-
+//load images before game starts
 function loadImages(sources, callback) {
     var images = {};
     var loadedImages = 0;
@@ -76,22 +82,20 @@ function loadImages(sources, callback) {
         images[src].src = sources[src];
     }
 }
-
 function initGame(images) {
     // some code here...
     setTimeout(function(){
       document.getElementById('loader').style.display = 'none';
       MAINGAME();
-
-
-
+      //splash screen
     }, 2000);
 
 }
 
 
 function MAINGAME(){
-
+  //start music
+  music.play();
   Physics(function (world) {
       //variables that reset
       var display_text = '';
@@ -208,23 +212,25 @@ function MAINGAME(){
     }
       function keydown(e) {
         if (e.keyCode == "82") {
-
-
+          woosh.play();
           flash_screen();
 
           //world.pause();
 
         }
         if (e.keyCode == "49") { //1
+          click.play();
           place_state = 1;
         }
         if (e.keyCode == "50") {//2
           if(hardness > 1 || levels > 1){
+            click.play();
             place_state = 2;
           }
         }
         if (e.keyCode == "51") {//3
           if(hardness > 1 || levels > 7){
+            click.play();
             place_state = 3;
           }
         }
@@ -238,8 +244,8 @@ function MAINGAME(){
           var y = ((ev.clientY - canvas.offsetTop)/canvas.clientHeight)*600;//*window.innerHeight)/600;
 
 
-
           if(mode == 1){
+            click.play();
             mode = 2;
             x = null;
             y = null;
@@ -249,6 +255,7 @@ function MAINGAME(){
           if(mode == 2){
             if( y > 400 & y< 450){
               if(x>200 & x< 300){
+                click.play();
                 mode = 3;
                 attractor_count = 20;
                 hardness = 1;
@@ -258,6 +265,7 @@ function MAINGAME(){
                 flash_screen();
               }
               else if(x>350 & x< 450){
+                click.play();
                 mode = 3;
                 hardness = 2;
                 attractor_count = 25;
@@ -267,6 +275,7 @@ function MAINGAME(){
                 flash_screen();
               }
               else if(x>500 & x< 600){
+                click.play();
                 mode = 3;
                 hardness = 3;
                 attractor_count = 30;
@@ -285,12 +294,14 @@ function MAINGAME(){
           if(mode == 3){
             if(x < 100){
               if(y< 100 && y > 0){
+                click.play();
                 flash_screen();
                 mode = 2;
               }
-              else if(y< 200 && y > 100){flash_screen();}
-              else if(y< 300 && y > 200 && !paused){place_state = 1;}
+              else if(y< 200 && y > 100){flash_screen(); woosh.play();}
+              else if(y< 300 && y > 200 && !paused){place_state = 1; click.play();}
               else if(y<400 && y> 300 && !paused){
+                click.play();
                 if(hardness == 1){
                   if(levels> 1){place_state = 2;}
                 }
@@ -298,12 +309,14 @@ function MAINGAME(){
               }
 
               else if(y<500 && y > 400 ){
+                click.play();
                 if(hardness == 1){
                   if(levels> 7){place_state = 3;}
                 }
                 else{place_state = 3;}
               }
               else if(y<600 && y > 500){
+                click.play();
                 if(pause_count > 0){
                   if(paused){
                     world.unpause();
@@ -320,16 +333,19 @@ function MAINGAME(){
             else{
               if(attractor_count > 0 && x > 100 && place_state == 1 && paused == false){
                 world.wakeUpAll(); //keep
+                plop1.play();
                 add_attractor(x,y);
                 attractor_count = attractor_count - 1;
               }
               if(repel_count > 0 && x > 100 && place_state == 2 && paused == false){
                 world.wakeUpAll(); //keep
+                plop2.play();
                 add_repel(x, y);
                 repel_count = repel_count - 1;
               }
               if(move_count > 0 && x > 100 && place_state == 3 && paused == false){
                 world.wakeUpAll(); //keep
+                ding.play();
                 add_move(x, y);
                 move_count = move_count - 1;
               }
@@ -339,11 +355,6 @@ function MAINGAME(){
           if(mode == 4){
             mode = 2;
             ctx.clearRect(0,0,800,600);
-
-
-
-
-
           }
 
 
@@ -382,6 +393,7 @@ function MAINGAME(){
 
           ctx.fillStyle = "#ea5959";
           ctx.fillRect(0, 200, 100, 100);
+          ctx.textAlign = "center";
 
             if(hardness > 1 || levels > 1){
               ctx.fillStyle = "#4286f4";
@@ -397,7 +409,7 @@ function MAINGAME(){
           ctx.lineWidth = 4;
           if(place_state==1){
             ctx.fillStyle = 'white';
-            ctx.fillText(attractor_count, 35, 260);
+            ctx.fillText(attractor_count, 50, 260);
             ctx.beginPath();
             ctx.arc(50, 250, 30, 0, 2 * Math.PI);
             ctx.stroke();
@@ -411,13 +423,13 @@ function MAINGAME(){
           }
           else{
             ctx.fillStyle = 'black';
-            ctx.fillText(attractor_count, 35, 260);
+            ctx.fillText(attractor_count, 50, 260);
 
           }
           if(place_state==2){
             if(hardness > 1 || levels > 1){
               ctx.fillStyle = 'white';
-              ctx.fillText(repel_count, 35, 360);
+              ctx.fillText(repel_count, 50, 360);
 
               ctx.beginPath();
               ctx.arc(50, 350, 30, 0, 2 * Math.PI);
@@ -432,14 +444,14 @@ function MAINGAME(){
           else{
             if(hardness > 1 || levels > 1){
               ctx.fillStyle = 'black';
-              ctx.fillText(repel_count, 35, 360);
+              ctx.fillText(repel_count, 50, 360);
             }
 
           }
           if(place_state == 3){
             if(levels> 7 || hardness>1){
               ctx.fillStyle = 'white';
-              ctx.fillText(move_count, 35, 460);
+              ctx.fillText(move_count, 50, 460);
 
               ctx.beginPath();
               ctx.arc(50, 450, 30, 0, 2 * Math.PI);
@@ -452,8 +464,9 @@ function MAINGAME(){
           }
           else{
             if(levels> 7 || hardness>1){
+
               ctx.fillStyle = 'black';
-              ctx.fillText(move_count, 35, 460);
+              ctx.fillText(move_count, 50, 460);
             }4
 
           }
@@ -464,7 +477,7 @@ function MAINGAME(){
 
           ctx.fillStyle = 'white';
           ctx.fillText(levels, 400, 50);
-          ctx.fillText(display_text, 800/3, 800/5);
+          ctx.fillText(display_text, 800/2, 800/5);
           //render everythin else
 
 
@@ -741,6 +754,7 @@ function MAINGAME(){
       //handle the keyboard
 
       function next_section(){
+          complete.play()
             if(hardness == 1){
               if(easy_progress <= levels){
                 easy_progress = levels;
@@ -893,7 +907,7 @@ function MAINGAME(){
         add_rect(500,450, 315, 15);
       }
       function level10(){
-        display_text = "          Don't touch that!"
+        display_text = "Don't touch that!"
         add_player(300,300);
         add_death(450, 300);
         add_finish(600,300);
@@ -930,7 +944,7 @@ function MAINGAME(){
       }
 
       function med_level1(){
-        display_text = '             Here We Go!';
+        display_text = 'Here We Go!';
         add_player(300,300);
         add_finish(600,300);
       }
@@ -988,7 +1002,7 @@ function MAINGAME(){
 
       }
       function med_level7(){
-        display_text='                Little Dipper??';
+        display_text='Little Dipper??';
         add_player(200,300);
         add_finish(700,300);
 
@@ -1002,7 +1016,7 @@ function MAINGAME(){
 
       }
       function med_level8(){
-        display_text="            It only takes one";
+        display_text="It only takes one";
         add_player(200,500);
         add_finish(700, 100);
 
@@ -1067,7 +1081,7 @@ function MAINGAME(){
 
       }
       function med_level15(){
-        display_text = '                Thanks Karlie!'
+        display_text = 'Thanks Karlie!'
         add_player(450,350);
         add_finish(450, 500);
 
@@ -1081,7 +1095,7 @@ function MAINGAME(){
       }
 
       function hard_level1(){
-        display_text = '             Good luck!';
+        display_text = 'Good luck!';
         add_player(300,300);
         add_finish(600,300);
       }
@@ -1107,7 +1121,7 @@ function MAINGAME(){
         add_finish(600,300);
       }
       function hard_level4(){
-        display_text = '                Think fast!';
+        display_text = 'Think fast!';
         add_player(400,550);
         add_repel(400,600);
         add_finish(500,100);
@@ -1159,7 +1173,7 @@ function MAINGAME(){
 
       }
       function hard_level10(){
-        display_text = "    I'll give you a break ;)";
+        display_text = "I'll give you a break ;)";
         add_player(300,300);
         add_finish(700,300);
         add_repel(300,100);
@@ -1167,7 +1181,7 @@ function MAINGAME(){
         add_death(500,300);
       }
       function hard_level11(){
-        display_text = '      I hope you saved one';
+        display_text = 'I hope you saved one';
         add_player(200,300);
         add_move(200, 100);
         add_move(200,500);
@@ -1175,7 +1189,7 @@ function MAINGAME(){
       }
       function hard_level12(){
 
-        display_text = '           Distraction is Key';
+        display_text = 'Distraction is Key';
         add_player(200,300);
         add_rect(300,300,15,300);
         add_rect(600,300,15,300);
@@ -1286,11 +1300,9 @@ function MAINGAME(){
   }
   run_levels();
 
-
       // add things to the world
 
       world.add([
-
 
            //Physics.behavior('constant-acceleration')
           Physics.behavior('body-impulse-response')

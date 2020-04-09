@@ -9,8 +9,6 @@ body,html{
   background-color: rgba(60, 65, 70, 1);
 }
 body{
-
-
     position: fixed;
     font-family:
         'Montserrat',
@@ -27,20 +25,13 @@ canvas {
   border: 3px solid white;
 }
 #overlay {
-position: relative;
-
-width: 10000px;
-height:10000px;
-background-color: rgba(60, 65, 70, 0);
-
-}
-button{
+  position: relative;
+  width: 10000px;
+  height:10000px;
+  background-color: rgba(60, 65, 70, 0);
 
 }
-.start-btn{
-  padding: 10px 15px;
 
-}
 .hide{
   display: none;
   z-index: 0;
